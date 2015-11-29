@@ -1,0 +1,34 @@
+html, body, h1, h2, h3, h4, h5, h6 {
+  font-family: "Helvetica Neue", Helvetica, "Microsoft Yahei", "Hiragino Sans GB", "WenQuanYi Micro Hei", sans-serif;
+}
+
+#ooi-page {
+  margin-top: 2px;
+  margin-bottom: 14px;
+}
+
+#ooi-logo img {
+  width: 80px;
+  height: 96px;
+}
+
+#ooi-headline h1 {
+  margin: 20px 0;
+  font-size: 42px;
+}
+
+#ooi-content {
+  margin-top: 15px;
+}
+
+#ooi-form p {
+  margin-left: 15px;
+}
+
+#ooi-announcement p {
+  text-indent: 2em;
+}
+
+#ooi-footer {
+  margin-top: 15px;
+}

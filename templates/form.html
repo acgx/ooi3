@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content -%}
+    <div id="ooi-form" class="uk-width-medium-2-5">
+      <form  method="post" class="uk-form uk-form-stacked">
+        <div class="uk-form-row">
+          <label class="uk-form-label" for="login_id">DMM登录ID：</label>
+          <div class="uk-form-controls">
+            <input id="login_id" maxlength="80" name="login_id" type="email" class="uk-form-large uk-form-width-large">
+          </div>
+        </div>
+        <div class="uk-form-row">
+          <label class="uk-form-label" for="password">DMM登录ID：</label>
+          <div class="uk-form-controls">
+            <input id="password" maxlength="80" name="password" type="password" class="uk-form-large uk-form-width-large">
+          </div>
+        </div>
+        <div class="uk-form-row">
+          <span class="uk-form-label">游戏方式：</span>
+          <p>
+            <input type="radio" id="mode1" name="mode" value="1"{% if mode == 1 %} checked{% endif %}>
+            <label for="mode1">在浏览器中运行</label>
+          </p>
+          <p>
+            <input type="radio" id="mode2" name="mode" value="2"{% if mode == 2 %} checked{% endif %}>
+            <label for="mode2">在KCV/74EO中运行</label>
+          </p>
+          <p>
+            <input type="radio" id="mode3" name="mode" value="3"{% if mode == 3 %} checked{% endif %}>
+            <label for="mode3">在poi中运行</label>
+          </p>
+        </div>
+        <div class="uk-form-row">
+          <button class="uk-button uk-button-primary uk-button-large">登录游戏</button>
+        </div>
+      </form>
+    </div>
+    <div id="ooi-announcement" class="uk-width-medium-3-5">
+      <h2 class="uk-text-primary">提示</h2>
+      <p>本站采用了OOI系统，OOI (Online Objects Integration)是针对DMM网页游戏《艦隊これくしょん -艦これ-》的在线缓存系统。</p>
+      <p>本站只支持DMM账号登录，不支持Facebook和Google账号登录。本网站不会保存任何用户信息，并对本网站服务可能造成的任何后果不负责任。</p>
+      <p>本站的源代码采用AGPLv3许可证开源，发布于 <a href="https://github.com/acgx/ooi3" target="_blank">此版本库</a>。</p>
+    </div>
+{%- endblock %}
