@@ -2,6 +2,11 @@
 
 {% block content -%}
     <div id="ooi-form" class="uk-width-medium-2-5">
+      {% if errmsg -%}
+      <div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin-bottom">
+        <p class="uk-text-danger">{{ errmsg }}</p>
+      </div>
+      {%- endif %}
       <form  method="post" class="uk-form uk-form-stacked">
         <div class="uk-form-row">
           <label class="uk-form-label" for="login_id">DMM登录ID：</label>

@@ -52,6 +52,7 @@ def main():
 
     # 给应用添加路由
     app.router.add_route('GET', '/', frontend.form)
+    app.router.add_route('POST', '/', frontend.login)
     app.router.add_route('POST', '/service/osapi', service.get_osapi)
     app.router.add_route('POST', '/service/flash', service.get_flash)
     app.router.add_static('/static', os.path.join(base_dir, 'static'))
