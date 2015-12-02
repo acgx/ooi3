@@ -66,8 +66,29 @@ class FrontEndHandler:
             context = {'errmsg': '请输入完整的登录ID和密码', 'mode': mode}
             return aiohttp_jinja2.render_template('form.html', request, context)
 
-    def normal(self):
-        pass
+    async def normal(self, request):
+        """适配浏览器中进行游戏的页面，该页面会检查会话中是否有api_token、api_starttime和world_ip三个参数，缺少其中任意一个都不能
+        进行游戏，跳转回登录页面。
+
+        :param request: aiohttp.web.Request
+        :return: aiohttp.web.Response or aiohttp.web.HTTPFound
+        """
+        session = await get_session(request)
+        token = session.get('api_token', None)
+        starttime = session.get('api_starttime', None)
+        world_ip = session.get('world_ip', None)
+        if token and starttime and world_ip:
+            context = {'scheme': request.scheme,
+                       'host': request.host,
+                       'token': token,
+                       'starttime': starttime,
+                       'world_ip': world_ip}
+            return aiohttp_jinja2.render_template('normal.html', request, context)
+        else:
+            del session['api_token']
+            del session['api_starttime']
+            del session['world_ip']
+            return HTTPFound('/')
 
     def kcv(self):
         pass
