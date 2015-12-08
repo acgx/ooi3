@@ -54,6 +54,7 @@ def main():
     app.router.add_route('GET', '/', frontend.form)
     app.router.add_route('POST', '/', frontend.login)
     app.router.add_route('GET', '/kancolle', frontend.normal)
+    app.router.add_route('GET', '/poi', frontend.poi)
     app.router.add_route('POST', '/service/osapi', service.get_osapi)
     app.router.add_route('POST', '/service/flash', service.get_flash)
     app.router.add_static('/static', os.path.join(base_dir, 'static'))
