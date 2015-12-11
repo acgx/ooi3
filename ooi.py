@@ -2,7 +2,6 @@
 
 import argparse
 import asyncio
-import os
 
 import jinja2
 from aiohttp import web
@@ -19,8 +18,6 @@ parser.add_argument('-H', '--host', default='127.0.0.1',
                     help='The host of OOI server')
 parser.add_argument('-p', '--port', type=int, default=9999,
                     help='The port of OOI server')
-
-base_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 def main():
@@ -48,7 +45,7 @@ def main():
     app = web.Application(middlewares=middlewares, loop=loop)
 
     # 定义Jinja2模板位置
-    aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(os.path.join(base_dir, 'templates')))
+    aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(config.template_dir))
 
     # 给应用添加路由
     app.router.add_route('GET', '/', frontend.form)
@@ -57,7 +54,8 @@ def main():
     app.router.add_route('GET', '/poi', frontend.poi)
     app.router.add_route('POST', '/service/osapi', service.get_osapi)
     app.router.add_route('POST', '/service/flash', service.get_flash)
-    app.router.add_static('/static', os.path.join(base_dir, 'static'))
+    app.router.add_static('/static', config.static_dir)
+    app.router.add_static('/_kcs', config.kcs_dir)
     app_handlers = app.make_handler()
 
     # 启动OOI服务器
