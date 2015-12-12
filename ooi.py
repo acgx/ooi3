@@ -10,6 +10,7 @@ from aiohttp_session import session_middleware
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 
 from base import config
+from handlers.api import APIHandler
 from handlers.frontend import FrontEndHandler
 from handlers.service import ServiceHandler
 
@@ -35,6 +36,7 @@ def main():
     loop = asyncio.get_event_loop()
 
     # 初始化请求处理器
+    api = APIHandler()
     frontend = FrontEndHandler()
     service = ServiceHandler()
 
@@ -52,10 +54,13 @@ def main():
     app.router.add_route('POST', '/', frontend.login)
     app.router.add_route('GET', '/kancolle', frontend.normal)
     app.router.add_route('GET', '/poi', frontend.poi)
+    app.router.add_route('GET', '/kcsapi/{action:.+}', api.api)
+    app.router.add_route('POST', '/kcsapi/{action:.+}', api.api)
+    app.router.add_route('GET', '/kcs/resources/image/world/{server:[\d_]+}{size:l|s}.png', api.world_image)
     app.router.add_route('POST', '/service/osapi', service.get_osapi)
     app.router.add_route('POST', '/service/flash', service.get_flash)
     app.router.add_static('/static', config.static_dir)
-    app.router.add_static('/_kcs', config.kcs_dir)
+    app.router.add_static('/kcs', config.kcs_dir)
     app_handlers = app.make_handler()
 
     # 启动OOI服务器
