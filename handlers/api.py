@@ -37,7 +37,7 @@ class APIHandler:
             ip_sections = map(int, world_ip.split('.'))
             world_ip = '_'.join([format(x, '03') for x in ip_sections])
             url = 'http://203.104.209.102/kcs/resources/image/world/' + world_ip + '_' + size + '.png'
-            coro = aiohttp.get(url)
+            coro = aiohttp.get(url, connector=self.connector)
             try:
                 response = await asyncio.wait_for(coro, timeout=5)
             except asyncio.TimeoutError:
