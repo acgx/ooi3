@@ -81,8 +81,7 @@ class FrontEndHandler:
             context = {'scheme': request.scheme,
                        'host': request.host,
                        'token': token,
-                       'starttime': starttime,
-                       'world_ip': world_ip}
+                       'starttime': starttime}
             return aiohttp_jinja2.render_template('normal.html', request, context)
         else:
             del session['api_token']
@@ -124,8 +123,7 @@ class FrontEndHandler:
             context = {'scheme': request.scheme,
                        'host': request.host,
                        'token': token,
-                       'starttime': starttime,
-                       'world_ip': world_ip}
+                       'starttime': starttime}
             return aiohttp_jinja2.render_template('flash.html', request, context)
         else:
             del session['api_token']
@@ -148,8 +146,7 @@ class FrontEndHandler:
             context = {'scheme': request.scheme,
                        'host': request.host,
                        'token': token,
-                       'starttime': starttime,
-                       'world_ip': world_ip}
+                       'starttime': starttime}
             return aiohttp_jinja2.render_template('poi.html', request, context)
         else:
             del session['api_token']
