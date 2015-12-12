@@ -67,8 +67,8 @@ class FrontEndHandler:
             return aiohttp_jinja2.render_template('form.html', request, context)
 
     async def normal(self, request):
-        """适配浏览器中进行游戏的页面，该页面会检查会话中是否有api_token、api_starttime和world_ip三个参数，缺少其中任意一个都不能
-        进行游戏，跳转回登录页面。
+        """适配浏览器中进行游戏的页面，该页面会检查会话中是否有api_token、api_starttime和world_ip三个参数，缺少其中任意一个都不能进行
+        游戏，跳转回登录页面。
 
         :param request: aiohttp.web.Request
         :return: aiohttp.web.Response or aiohttp.web.HTTPFound
@@ -91,8 +91,8 @@ class FrontEndHandler:
             return aiohttp.web.HTTPFound('/')
 
     async def kcv(self, request):
-        """适配KanColleViewer或者74EO中进行游戏的页面，提供一个iframe，在iframe中载入游戏FLASH。该页面会检查会话中是否有api_token、api_starttime和world_ip三个参数，缺少其中任意一个都不能
-        进行游戏，跳转回登录页面。
+        """适配KanColleViewer或者74EO中进行游戏的页面，提供一个iframe，在iframe中载入游戏FLASH。该页面会检查会话中是否有api_token、
+        api_starttime和world_ip三个参数，缺少其中任意一个都不能进行游戏，跳转回登录页面。
 
         :param request: aiohttp.web.Request
         :return: aiohttp.web.Response or aiohttp.web.HTTPFound
@@ -110,8 +110,8 @@ class FrontEndHandler:
             return aiohttp.web.HTTPFound('/')
 
     async def flash(self, request):
-        """适配KanColleViewer或者74EO中进行游戏的页面，展示，该页面会检查会话中是否有api_token、api_starttime和world_ip三个参数，缺少其中任意一个都不能
-        进行游戏，跳转回登录页面。
+        """适配KanColleViewer或者74EO中进行游戏的页面，展示，该页面会检查会话中是否有api_token、api_starttime和world_ip三个参数，
+        缺少其中任意一个都不能进行游戏，跳转回登录页面。
 
         :param request: aiohttp.web.Request
         :return: aiohttp.web.Response or aiohttp.web.HTTPFound
@@ -134,8 +134,8 @@ class FrontEndHandler:
             return aiohttp.web.HTTPFound('/')
 
     async def poi(self, request):
-        """适配poi中进行游戏的页面，显示FLASH。该页面会检查会话中是否有api_token、api_starttime和world_ip三个参数，缺少其中任意一个都不能
-        进行游戏，跳转回登录页面。
+        """适配poi中进行游戏的页面，显示FLASH。该页面会检查会话中是否有api_token、api_starttime和world_ip三个参数，缺少其中任意一个
+        都不能进行游戏，跳转回登录页面。
 
         :param request: aiohttp.web.Request
         :return: aiohttp.web.Response or aiohttp.web.HTTPFound
