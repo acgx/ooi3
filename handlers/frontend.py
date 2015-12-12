@@ -12,6 +12,14 @@ from auth.kancolle import KancolleAuth, OOIAuthException
 class FrontEndHandler:
     """OOI3前端请求处理类。"""
 
+    def clear_session(self, session):
+        if 'api_token' in session:
+            del session['api_token']
+        if 'api_starttime' in session:
+            del session['api_starttime']
+        if 'world_ip' in session:
+            del session['world_ip']
+
     @aiohttp_jinja2.template('form.html')
     async def form(self, request):
         """展示登录表单。
@@ -84,9 +92,7 @@ class FrontEndHandler:
                        'starttime': starttime}
             return aiohttp_jinja2.render_template('normal.html', request, context)
         else:
-            del session['api_token']
-            del session['api_starttime']
-            del session['world_ip']
+            self.clear_session(session)
             return aiohttp.web.HTTPFound('/')
 
     async def kcv(self, request):
@@ -103,9 +109,7 @@ class FrontEndHandler:
         if token and starttime and world_ip:
             return aiohttp_jinja2.render_template('kcv.html', request, context={})
         else:
-            del session['api_token']
-            del session['api_starttime']
-            del session['world_ip']
+            self.clear_session(session)
             return aiohttp.web.HTTPFound('/')
 
     async def flash(self, request):
@@ -126,9 +130,7 @@ class FrontEndHandler:
                        'starttime': starttime}
             return aiohttp_jinja2.render_template('flash.html', request, context)
         else:
-            del session['api_token']
-            del session['api_starttime']
-            del session['world_ip']
+            self.clear_session(session)
             return aiohttp.web.HTTPFound('/')
 
     async def poi(self, request):
@@ -149,9 +151,7 @@ class FrontEndHandler:
                        'starttime': starttime}
             return aiohttp_jinja2.render_template('poi.html', request, context)
         else:
-            del session['api_token']
-            del session['api_starttime']
-            del session['world_ip']
+            self.clear_session(session)
             return aiohttp.web.HTTPFound('/')
 
     async def logout(self, request):
@@ -161,10 +161,5 @@ class FrontEndHandler:
         :return: aiohttp.web.HTTPFound
         """
         session = await get_session(request)
-        if 'api_token' in session:
-            del session['api_token']
-        if 'api_starttime' in session:
-            del session['api_starttime']
-        if 'world_ip' in session:
-            del session['world_ip']
+        self.clear_session(session)
         return aiohttp.web.HTTPFound('/')
