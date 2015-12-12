@@ -53,6 +53,8 @@ def main():
     app.router.add_route('GET', '/', frontend.form)
     app.router.add_route('POST', '/', frontend.login)
     app.router.add_route('GET', '/kancolle', frontend.normal)
+    app.router.add_route('GET', '/kcv', frontend.kcv)
+    app.router.add_route('GET', '/flash', frontend.flash)
     app.router.add_route('GET', '/poi', frontend.poi)
     app.router.add_route('GET', '/kcsapi/{action:.+}', api.api)
     app.router.add_route('POST', '/kcsapi/{action:.+}', api.api)
