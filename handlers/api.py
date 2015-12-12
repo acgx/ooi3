@@ -36,7 +36,14 @@ class APIHandler:
         if world_ip:
             ip_sections = map(int, world_ip.split('.'))
             world_ip = '_'.join([format(x, '03') for x in ip_sections])
-            return aiohttp.web.HTTPFound('/_kcs/resources/image/world/' + world_ip + '_' + size + '.png')
+            url = 'http://203.104.209.102/kcs/resources/image/world/' + world_ip + '_' + size + '.png'
+            coro = aiohttp.get(url)
+            try:
+                response = await asyncio.wait_for(coro, timeout=5)
+            except asyncio.TimeoutError:
+                return aiohttp.web.HTTPBadRequest()
+            body = await response.read()
+            return aiohttp.web.Response(body=body, headers={'Content-Type': 'image/png'})
         else:
             return aiohttp.web.HTTPBadRequest()
 
