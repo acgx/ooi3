@@ -1,3 +1,8 @@
 .idea
 __pycache__/
 _kcs/
+/bin/
+/lib/
+/lib64
+/pip-selfcheck.json
+/pyvenv.cfg
