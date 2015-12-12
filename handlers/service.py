@@ -2,8 +2,8 @@
 只接受POST请求，包括login_id和password两个参数，返回用户的内嵌游戏网页地址或游戏FLASH地址。请求缺少参数时返回400错误。
 """
 
-from aiohttp import web
-from aiohttp import MultiDict
+import aiohttp
+import aiohttp.web
 import json
 
 from auth.exceptions import OOIAuthException
@@ -17,14 +17,14 @@ class ServiceHandler:
         """获取用户的内嵌游戏网页地址，返回一个JSON格式的字典。
         结果中`status`键值为1时获取成功，`osapi_url`键值为内嵌网页地址；`status`为0时获取失败，`message`键值提供了错误信息。
 
-        :param request: web.Request
-        :return: web.Response
+        :param request: aiohttp.web.Request
+        :return: aiohttp.web.Response or aiohttp.web.HTTPBadRequest
         """
         data = await request.post()
         login_id = data.get('login_id', None)
         password = data.get('password', None)
         if login_id and password:
-            headers = MultiDict({'Content-Type': 'application/json'})
+            headers = aiohttp.MultiDict({'Content-Type': 'application/json'})
             kancolle = KancolleAuth(login_id, password)
             try:
                 osapi_url = await kancolle.get_osapi()
@@ -33,22 +33,22 @@ class ServiceHandler:
             except OOIAuthException as e:
                 result = {'status': 0,
                           'message': e.message}
-            return web.Response(body=json.dumps(result).encode(), headers=headers)
+            return aiohttp.web.Response(body=json.dumps(result).encode(), headers=headers)
         else:
-            return web.HTTPBadRequest()
+            return aiohttp.web.HTTPBadRequest()
 
     async def get_flash(self, request):
         """获取用户的游戏FLASH地址，返回一个JSON格式的字典。
         结果中`status`键值为1时获取成功，`flash_url`键值为游戏FLASH地址；`status`为0时获取失败，`message`键值提供了错误信息。
 
-        :param request: web.Request
-        :return: web.Response
+        :param request: aiohttp.web.Request
+        :return: aiohttp.web.Response or aiohttp.web.HTTPBadRequest
         """
         data = await request.post()
         login_id = data.get('login_id', None)
         password = data.get('password', None)
         if login_id and password:
-            headers = MultiDict({'Content-Type': 'application/json'})
+            headers = aiohttp.MultiDict({'Content-Type': 'application/json'})
             kancolle = KancolleAuth(login_id, password)
             try:
                 flash_url = await kancolle.get_flash()
@@ -57,6 +57,6 @@ class ServiceHandler:
             except OOIAuthException as e:
                 result = {'status': 0,
                           'message': e.message}
-            return web.Response(body=json.dumps(result).encode(), headers=headers)
+            return aiohttp.web.Response(body=json.dumps(result).encode(), headers=headers)
         else:
-            return web.HTTPBadRequest()
+            return aiohttp.web.HTTPBadRequest()

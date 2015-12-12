@@ -2,8 +2,8 @@
 包含了登录表单、登录后的跳转、不同的游戏运行模式和注销页面。
 """
 
+import aiohttp.web
 import aiohttp_jinja2
-from aiohttp.web import HTTPFound
 from aiohttp_session import get_session
 
 from auth.kancolle import KancolleAuth, OOIAuthException
@@ -16,7 +16,7 @@ class FrontEndHandler:
     async def form(self, request):
         """展示登录表单。
 
-        :param request: web.Request
+        :param request: aiohttp.web.Request
         :return: dict
         """
         session = await get_session(request)
@@ -31,8 +31,8 @@ class FrontEndHandler:
     async def login(self, request):
         """接受登录表单提交的数据，登录后跳转或登录失败后展示错误信息。
 
-        :param request: web.Request
-        :return: web.HTTPFound or web.Response
+        :param request: aiohttp.web.Request
+        :return: aiohttp.web.HTTPFound or aiohttp.web.Response
         """
         post = await request.post()
         session = await get_session(request)
@@ -52,11 +52,11 @@ class FrontEndHandler:
                 session['api_starttime'] = kancolle.api_starttime
                 session['world_ip'] = kancolle.world_ip
                 if mode == 2:
-                    return HTTPFound('/kcv')
+                    return aiohttp.web.HTTPFound('/kcv')
                 elif mode == 3:
-                    return HTTPFound('/poi')
+                    return aiohttp.web.HTTPFound('/poi')
                 else:
-                    return HTTPFound('/kancolle')
+                    return aiohttp.web.HTTPFound('/kancolle')
 
             except OOIAuthException as e:
                 context = {'errmsg': e.message, 'mode': mode}
@@ -88,7 +88,7 @@ class FrontEndHandler:
             del session['api_token']
             del session['api_starttime']
             del session['world_ip']
-            return HTTPFound('/')
+            return aiohttp.web.HTTPFound('/')
 
     def kcv(self):
         pass
@@ -115,7 +115,7 @@ class FrontEndHandler:
             del session['api_token']
             del session['api_starttime']
             del session['world_ip']
-            return HTTPFound('/')
+            return aiohttp.web.HTTPFound('/')
 
     def logout(self):
         pass

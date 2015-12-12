@@ -4,7 +4,7 @@ import argparse
 import asyncio
 
 import jinja2
-from aiohttp import web
+import aiohttp.web
 import aiohttp_jinja2
 from aiohttp_session import session_middleware
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
@@ -44,7 +44,7 @@ def main():
     middlewares = [session_middleware(EncryptedCookieStorage(config.secret_key)), ]
 
     # 初始化应用
-    app = web.Application(middlewares=middlewares, loop=loop)
+    app = aiohttp.web.Application(middlewares=middlewares, loop=loop)
 
     # 定义Jinja2模板位置
     aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(config.template_dir))
