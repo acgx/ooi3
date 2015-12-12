@@ -157,5 +157,17 @@ class FrontEndHandler:
             del session['world_ip']
             return aiohttp.web.HTTPFound('/')
 
-    def logout(self):
-        pass
+    async def logout(self, request):
+        """ 注销已登录的用户。
+        清除所有的session，返回首页。
+
+        :return: aiohttp.web.HTTPFound
+        """
+        session = await get_session(request)
+        if 'api_token' in session:
+            del session['api_token']
+        if 'api_starttime' in session:
+            del session['api_starttime']
+        if 'world_ip' in session:
+            del session['world_ip']
+        return aiohttp.web.HTTPFound('/')

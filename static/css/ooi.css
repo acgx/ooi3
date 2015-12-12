@@ -32,3 +32,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 #ooi-footer {
   margin-top: 15px;
 }
+
+#ooi-game #externalswf {
+  margin: 0 auto 15px auto;
+}
