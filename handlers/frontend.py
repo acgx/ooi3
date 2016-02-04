@@ -52,25 +52,34 @@ class FrontEndHandler:
         session['mode'] = mode
 
         if login_id and password:
-
             kancolle = KancolleAuth(login_id, password)
-            try:
-                await kancolle.get_flash()
-                session['api_token'] = kancolle.api_token
-                session['api_starttime'] = kancolle.api_starttime
-                session['world_ip'] = kancolle.world_ip
-                if mode == 2:
-                    return aiohttp.web.HTTPFound('/kcv')
-                elif mode == 3:
-                    return aiohttp.web.HTTPFound('/poi')
-                else:
-                    return aiohttp.web.HTTPFound('/kancolle')
+            if mode in (1, 2, 3):
+                try:
+                    await kancolle.get_flash()
+                    session['api_token'] = kancolle.api_token
+                    session['api_starttime'] = kancolle.api_starttime
+                    session['world_ip'] = kancolle.world_ip
+                    if mode == 2:
+                        return aiohttp.web.HTTPFound('/kcv')
+                    elif mode == 3:
+                        return aiohttp.web.HTTPFound('/poi')
+                    else:
+                        return aiohttp.web.HTTPFound('/kancolle')
 
-            except OOIAuthException as e:
-                context = {'errmsg': e.message, 'mode': mode}
-                return aiohttp_jinja2.render_template('form.html', request, context)
+                except OOIAuthException as e:
+                    context = {'errmsg': e.message, 'mode': mode}
+                    return aiohttp_jinja2.render_template('form.html', request, context)
+            elif mode == 4:
+                try:
+                    osapi_url = await kancolle.get_osapi()
+                    session['osapi_url'] = osapi_url
+                    return aiohttp.web.HTTPFound('/connector')
+                except OOIAuthException as e:
+                    context = {'errmsg': e.message, 'mode': mode}
+                    return aiohttp_jinja2.render_template('form.html', request, context)
+            else:
+                raise aiohttp.web.HTTPBadRequest()
         else:
-
             context = {'errmsg': '请输入完整的登录ID和密码', 'mode': mode}
             return aiohttp_jinja2.render_template('form.html', request, context)
 
@@ -150,6 +159,21 @@ class FrontEndHandler:
                        'token': token,
                        'starttime': starttime}
             return aiohttp_jinja2.render_template('poi.html', request, context)
+        else:
+            self.clear_session(session)
+            return aiohttp.web.HTTPFound('/')
+
+    async def connector(self, request):
+        """适配登录器直连模式结果页面，提供osapi.dmm.com的链接。
+
+        :param request: aiohttp.web.Request
+        :return: aiohttp.web.Response or aiohttp.web.HTTPFound
+        """
+        session = await get_session(request)
+        osapi_url = session.get('osapi_url', None)
+        if osapi_url:
+            context = {'osapi_url': osapi_url}
+            return aiohttp_jinja2.render_template('connector.html', request, context)
         else:
             self.clear_session(session)
             return aiohttp.web.HTTPFound('/')
