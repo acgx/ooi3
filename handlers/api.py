@@ -51,7 +51,7 @@ class APIHandler:
                     return aiohttp.web.HTTPBadRequest()
                 body = await response.read()
                 self.worlds[image_name] = body
-            return aiohttp.web.Response(body=body, headers={'Content-Type': 'image/png'})
+            return aiohttp.web.Response(body=body, headers={'Content-Type': 'image/png', 'Cache-Control': 'no-cache'})
         else:
             return aiohttp.web.HTTPBadRequest()
 
@@ -86,7 +86,7 @@ class APIHandler:
                 except asyncio.TimeoutError:
                     return aiohttp.web.HTTPBadRequest()
                 body = await response.read()
-                if action == 'api_start2':
+                if action == 'api_start2' and len(body) > 100000:
                     self.api_start2 = body
                 return aiohttp.web.Response(body=body, headers=aiohttp.MultiDict({'Content-Type': 'text/plain'}))
         else:
