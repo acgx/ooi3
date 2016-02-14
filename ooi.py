@@ -60,7 +60,7 @@ def main():
     app.router.add_route('GET', '/logout', frontend.logout)
     app.router.add_route('GET', '/kcsapi/{action:.+}', api.api)
     app.router.add_route('POST', '/kcsapi/{action:.+}', api.api)
-    app.router.add_route('GET', '/kcs/resources/image/world/{server:.+}_{size:l|s}.png', api.world_image)
+    app.router.add_route('GET', '/kcs/resources/image/world/{server:.+}_{size:[lst]}.png', api.world_image)
     app.router.add_route('POST', '/service/osapi', service.get_osapi)
     app.router.add_route('POST', '/service/flash', service.get_flash)
     app.router.add_static('/static', config.static_dir)
