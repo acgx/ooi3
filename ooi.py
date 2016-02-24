@@ -79,7 +79,7 @@ def main():
         loop.run_until_complete(app_handlers.finish_connections(1.0))
         server.close()
         loop.run_until_complete(server.wait_closed())
-        loop.run_until_complete(app.finish())
+        loop.run_until_complete(app.cleanup())
     loop.close()
 
 if __name__ == '__main__':
