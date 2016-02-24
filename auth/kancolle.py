@@ -99,7 +99,8 @@ class KancolleAuth:
         """
         self.session.close()
 
-    async def _request(self, url, method='GET', data=None, timeout_message='连接失败', timeout=10):
+    @asyncio.coroutine
+    def _request(self, url, method='GET', data=None, timeout_message='连接失败', timeout=10):
         """使用asyncio.wait_for包装过的会话向远端服务器发起请求。
         `url`为请求的URL地址，`method`为请求的方法， `data`为发起POST请求时的数据，`timeout_message`为请求超时后抛出异常所带的信息，
         `timeout`为超时时间，单位为秒。
@@ -112,18 +113,21 @@ class KancolleAuth:
         :return: generator
         """
         try:
-            return await asyncio.wait_for(self.session.request(method, url, data=data, headers=self.headers), timeout)
+            response = yield from asyncio.wait_for(self.session.request(method, url, data=data, headers=self.headers),
+                                                   timeout)
+            return response
         except asyncio.TimeoutError:
             raise OOIAuthException(timeout_message)
 
-    async def _get_dmm_tokens(self):
+    @asyncio.coroutine
+    def _get_dmm_tokens(self):
         """解析DMM的登录页面，获取dmm_token和token，返回dmm_token和token的值。
 
         :return: tuple
         """
-        response = await self._request(self.urls['login'], method='GET', data=None,
-                                       timeout_message='连接DMM登录页失败')
-        html = await response.text()
+        response = yield from self._request(self.urls['login'], method='GET', data=None,
+                                            timeout_message='连接DMM登录页失败')
+        html = yield from response.text()
 
         m = self.patterns['dmm_token'].search(html)
         if m:
@@ -139,7 +143,8 @@ class KancolleAuth:
 
         return self.dmm_token, self.token
 
-    async def _get_ajax_token(self):
+    @asyncio.coroutine
+    def _get_ajax_token(self):
         """根据在DMM登录页获得的dmm_token和token，发起一个AJAX请求，获取第二个token以及idKey和pwdKey。
 
         :return: tuple
@@ -149,16 +154,17 @@ class KancolleAuth:
                              'DMM_TOKEN': self.dmm_token,
                              'X-Requested-With': 'XMLHttpRequest'})
         data = {'token': self.token}
-        response = await self._request(self.urls['ajax'], method='POST', data=data,
+        response = yield from self._request(self.urls['ajax'], method='POST', data=data,
                                        timeout_message='DMM登录页AJAX请求失败')
-        j = await response.json()
+        j = yield from response.json()
         self.token = j['token']
         self.idKey = j['login_id']
         self.pwdKey = j['password']
 
         return self.token, self.idKey, self.pwdKey
 
-    async def _get_osapi_url(self):
+    @asyncio.coroutine
+    def _get_osapi_url(self):
         """登录DMM账号，并转到《舰队collection》游戏页面，获取内嵌游戏网页的地址。
 
         :return: str
@@ -170,16 +176,16 @@ class KancolleAuth:
                 'token': self.token,
                 self.idKey: self.login_id,
                 self.pwdKey: self.password}
-        response = await self._request(self.urls['auth'], method='POST', data=data,
+        response = yield from self._request(self.urls['auth'], method='POST', data=data,
                                        timeout_message='连接DMM认证网页失败')
-        html = await response.text()
+        html = yield from response.text()
         m = self.patterns['reset'].search(html)
         if m:
             raise OOIAuthException('DMM强制要求用户修改密码')
 
-        response = await self._request(self.urls['game'],
+        response = yield from self._request(self.urls['game'],
                                        timeout_message='连接舰队collection游戏页面失败')
-        html = await response.text()
+        html = yield from response.text()
         m = self.patterns['osapi'].search(html)
         if m:
             self.osapi_url = m.group(1)
@@ -188,7 +194,8 @@ class KancolleAuth:
 
         return self.osapi_url
 
-    async def _get_world(self):
+    @asyncio.coroutine
+    def _get_world(self):
         """解析游戏内嵌网页地址，从DMM处获得用户所在服务器的ID和IP地址。
 
         :return: tuple
@@ -198,8 +205,8 @@ class KancolleAuth:
         self.st = qs['st'][0]
         url = self.urls['get_world'] % (self.owner, int(time.time()*1000))
         self.headers['Referer'] = self.osapi_url
-        response = await self._request(url, timeout_message='调查提督所在镇守府失败')
-        html = await response.text()
+        response = yield from self._request(url, timeout_message='调查提督所在镇守府失败')
+        html = yield from response.text()
         svdata = json.loads(html[7:])
         if svdata['api_result'] == 1:
             self.world_id = svdata['api_data']['api_world_id']
@@ -209,7 +216,8 @@ class KancolleAuth:
 
         return self.world_id, self.world_ip, self.st
 
-    async def _get_api_token(self):
+    @asyncio.coroutine
+    def _get_api_token(self):
         """根据用户所在服务器IP和用户自身的ID，从DMM处获得用户的api_token、api_starttim，并生成游戏FLASH的地址
 
         :return: tuple
@@ -226,9 +234,9 @@ class KancolleAuth:
                 'signViewer': 'true',
                 'gadget': 'http://203.104.209.7/gadget.xml',
                 'container': 'dmm'}
-        response = await self._request(self.urls['make_request'], method='POST', data=data,
+        response = yield from self._request(self.urls['make_request'], method='POST', data=data,
                                        timeout_message='调查提督进入镇守府的口令失败')
-        html = await response.text()
+        html = yield from response.text()
         svdata = json.loads(html[27:])
         if svdata[url]['rc'] != 200:
             raise OOIAuthException('调查提督进入镇守府的口令失败')
@@ -241,22 +249,24 @@ class KancolleAuth:
 
         return self.api_token, self.api_starttime, self.flash
 
-    async def get_osapi(self):
+    @asyncio.coroutine
+    def get_osapi(self):
         """登录游戏，获取内嵌游戏网页地址并返回
 
         :return: str
         """
-        await self._get_dmm_tokens()
-        await self._get_ajax_token()
-        await self._get_osapi_url()
+        yield from self._get_dmm_tokens()
+        yield from self._get_ajax_token()
+        yield from self._get_osapi_url()
         return self.osapi_url
 
-    async def get_flash(self):
+    @asyncio.coroutine
+    def get_flash(self):
         """登录游戏，获取游戏FLASH地址并返回
 
         :return: str
         """
-        await self.get_osapi()
-        await self._get_world()
-        await self._get_api_token()
+        yield from self.get_osapi()
+        yield from self._get_world()
+        yield from self._get_api_token()
         return self.flash

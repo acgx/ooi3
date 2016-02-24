@@ -27,7 +27,8 @@ class APIHandler:
         self.api_start2 = None
         self.worlds = {}
 
-    async def world_image(self, request):
+    @asyncio.coroutine
+    def world_image(self, request):
         """ 显示正确的镇守府图片。
         舰娘游戏中客户端FLASH请求的镇守府图片是根据FLASH本身的URL生成的，需要根据用户所在的镇守府IP为其显示正确的图片。
 
@@ -35,7 +36,7 @@ class APIHandler:
         :return: aiohttp.web.HTTPFound or aiohttp.web.HTTPBadRequest
         """
         size = request.match_info['size']
-        session = await get_session(request)
+        session = yield from get_session(request)
         world_ip = session['world_ip']
         if world_ip:
             ip_sections = map(int, world_ip.split('.'))
@@ -46,23 +47,24 @@ class APIHandler:
                 url = 'http://203.104.209.102/kcs/resources/image/world/' + image_name + '.png'
                 coro = aiohttp.get(url, connector=self.connector)
                 try:
-                    response = await asyncio.wait_for(coro, timeout=5)
+                    response = yield from asyncio.wait_for(coro, timeout=5)
                 except asyncio.TimeoutError:
                     return aiohttp.web.HTTPBadRequest()
-                body = await response.read()
+                body = yield from response.read()
                 self.worlds[image_name] = body
             return aiohttp.web.Response(body=body, headers={'Content-Type': 'image/png', 'Cache-Control': 'no-cache'})
         else:
             return aiohttp.web.HTTPBadRequest()
 
-    async def api(self, request):
+    @asyncio.coroutine
+    def api(self, request):
         """ 转发客户端和游戏服务器之间的API通信。
 
         :param request: aiohttp.web.Request
         :return: aiohttp.web.Response or aiohttp.web.HTTPBadRequest
         """
         action = request.match_info['action']
-        session = await get_session(request)
+        session = yield from get_session(request)
         world_ip = session['world_ip']
         if world_ip:
             if action == 'api_start2' and self.api_start2 is not None:
@@ -79,13 +81,13 @@ class APIHandler:
                     'Referer': referrer,
                     'X-Requested-With': 'ShockwaveFlash/18.0.0.232'
                 })
-                data = await request.post()
+                data = yield from request.post()
                 coro = aiohttp.post(url, data=data, headers=headers, connector=self.connector)
                 try:
-                    response = await asyncio.wait_for(coro, timeout=5)
+                    response = yield from asyncio.wait_for(coro, timeout=5)
                 except asyncio.TimeoutError:
                     return aiohttp.web.HTTPBadRequest()
-                body = await response.read()
+                body = yield from response.read()
                 if action == 'api_start2' and len(body) > 100000:
                     self.api_start2 = body
                 return aiohttp.web.Response(body=body, headers=aiohttp.MultiDict({'Content-Type': 'text/plain'}))
