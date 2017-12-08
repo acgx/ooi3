@@ -15,9 +15,9 @@ class KancolleAuth:
     """针对网页游戏《舰队collection》的认证类。"""
 
     # 认证过程中需要的URLs
-    urls = {'login': 'https://www.dmm.com/my/-/login/',
-            'ajax': 'https://www.dmm.com/my/-/login/ajax-get-token/',
-            'auth': 'https://www.dmm.com/my/-/login/auth/',
+    urls = {'login': 'https://accounts.dmm.com/service/login/password/=/',
+            'ajax': 'https://accounts.dmm.com/service/api/get-token/',
+            'auth': 'https://accounts.dmm.com/service/login/password/authenticate/',
             'game': 'http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/',
             'make_request': 'http://osapi.dmm.com/gadgets/makeRequest',
             'get_world': 'http://203.104.209.7/kcsapi/api_world/get_id/%s/1/%d',
@@ -31,8 +31,8 @@ class KancolleAuth:
         "125.6.184.16",
         "125.6.187.205",
         "125.6.187.229",
-        "125.6.187.253",
-        "125.6.188.25",
+        "203.104.209.134",
+        "203.104.209.167",
         "203.104.248.135",
         "125.6.189.7",
         "125.6.189.39",
@@ -52,8 +52,8 @@ class KancolleAuth:
     user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
 
     # 匹配网页中所需信息的正则表达式
-    patterns = {'dmm_token': re.compile(r'"DMM_TOKEN", "([\d|\w]+)"'),
-                'token': re.compile(r'"token": "([\d|\w]+)"'),
+    patterns = {'dmm_token': re.compile(r'http-dmm-token" content="([\d|\w]+)"'),
+                'token': re.compile(r'token" content="([\d|\w]+)"'),
                 'reset': re.compile(r'認証エラー'),
                 'osapi': re.compile(r'URL\W+:\W+"(.*)",')}
 
@@ -140,7 +140,8 @@ class KancolleAuth:
             self.token = m.group(1)
         else:
             raise OOIAuthException('获取token失败')
-
+        #print(str(self.dmm_token))
+        #print(str(self.token))
         return self.dmm_token, self.token
 
     @asyncio.coroutine
@@ -149,18 +150,23 @@ class KancolleAuth:
 
         :return: tuple
         """
-        self.headers.update({'Origin': 'https://www.dmm.com',
+        self.headers.update({'Origin': 'https://accounts.dmm.com',
                              'Referer': self.urls['login'],
-                             'DMM_TOKEN': self.dmm_token,
+                             'http-dmm-token': self.dmm_token,
                              'X-Requested-With': 'XMLHttpRequest'})
         data = {'token': self.token}
         response = yield from self._request(self.urls['ajax'], method='POST', data=data,
                                        timeout_message='DMM登录页AJAX请求失败')
         j = yield from response.json()
-        self.token = j['token']
-        self.idKey = j['login_id']
-        self.pwdKey = j['password']
-
+		
+        #print(str(j))
+        #print(str(j['body']['token']))		
+        try:
+            self.token = j['body']['token']
+            self.idKey = j['body']['login_id']
+            self.pwdKey = j['body']['password']
+        except Exception:
+            raise OOIAuthException('DMM修改登录机制了，请通知管理员处理')
         return self.token, self.idKey, self.pwdKey
 
     @asyncio.coroutine
@@ -169,13 +175,13 @@ class KancolleAuth:
 
         :return: str
         """
-        del self.headers['DMM_TOKEN']
+        del self.headers['http-dmm-token']
         del self.headers['X-Requested-With']
         data = {'login_id': self.login_id,
                 'password': self.password,
                 'token': self.token,
-                self.idKey: self.login_id,
-                self.pwdKey: self.password}
+                'idKey': self.login_id,
+                'pwKey': self.password}
         response = yield from self._request(self.urls['auth'], method='POST', data=data,
                                        timeout_message='连接DMM认证网页失败')
         html = yield from response.text()
