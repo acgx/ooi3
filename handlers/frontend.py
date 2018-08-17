@@ -58,7 +58,7 @@ class FrontEndHandler:
             kancolle = KancolleAuth(login_id, password)
             if mode in (1, 2, 3):
                 try:
-                    yield from kancolle.get_flash()
+                    yield from kancolle.get_entry()
                     session['api_token'] = kancolle.api_token
                     session['api_starttime'] = kancolle.api_starttime
                     session['world_ip'] = kancolle.world_ip
@@ -100,7 +100,7 @@ class FrontEndHandler:
         world_ip = session.get('world_ip', None)
         if token and starttime and world_ip:
             context = {'scheme': request.scheme,
-                       'host': request.host,
+                       'host': world_ip,
                        'token': token,
                        'starttime': starttime}
             return aiohttp_jinja2.render_template('normal.html', request, context)
@@ -140,7 +140,7 @@ class FrontEndHandler:
         world_ip = session.get('world_ip', None)
         if token and starttime and world_ip:
             context = {'scheme': request.scheme,
-                       'host': request.host,
+                       'host': world_ip,
                        'token': token,
                        'starttime': starttime}
             return aiohttp_jinja2.render_template('flash.html', request, context)
@@ -162,7 +162,7 @@ class FrontEndHandler:
         world_ip = session.get('world_ip', None)
         if token and starttime and world_ip:
             context = {'scheme': request.scheme,
-                       'host': request.host,
+                       'host': world_ip,
                        'token': token,
                        'starttime': starttime}
             return aiohttp_jinja2.render_template('poi.html', request, context)

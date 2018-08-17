@@ -21,8 +21,8 @@ class KancolleAuth:
             'game': 'http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/',
             'make_request': 'http://osapi.dmm.com/gadgets/makeRequest',
             'get_world': 'http://203.104.209.7/kcsapi/api_world/get_id/%s/1/%d',
-            'get_flash': 'http://%s/kcsapi/api_auth_member/dmmlogin/%s/1/%d',
-            'flash': 'http://%s/kcs/mainD2.swf?api_token=%s&amp;api_starttime=%d'}
+            'get_entry': 'http://%s/kcsapi/api_auth_member/dmmlogin/%s/1/%d',
+            'entry': 'http://%s/kcs2/index.php?api_root=/kcsapi&voice_root=/kcs/sound&osapi_root=osapi.dmm.com&version=4.0.0.0&api_token=%s&api_starttime=%d'}
 
     # 各镇守府的IP列表
     world_ip_list = (
@@ -90,7 +90,7 @@ class KancolleAuth:
         self.world_ip = None
         self.api_token = None
         self.api_starttime = None
-        self.flash = None
+        self.entry = None
 
     def __del__(self):
         """析构函数，用于关闭aiohttp的会话。
@@ -228,7 +228,7 @@ class KancolleAuth:
 
         :return: tuple
         """
-        url = self.urls['get_flash'] % (self.world_ip, self.owner, int(time.time()*1000))
+        url = self.urls['get_entry'] % (self.world_ip, self.owner, int(time.time()*1000))
         data = {'url': url,
                 'httpMethod': 'GET',
                 'authz': 'signed',
@@ -251,9 +251,9 @@ class KancolleAuth:
             raise OOIAuthException('调查提督进入镇守府的口令时发生错误')
         self.api_token = svdata['api_token']
         self.api_starttime = svdata['api_starttime']
-        self.flash = self.urls['flash'] % (self.world_ip, self.api_token, self.api_starttime)
+        self.entry = self.urls['entry'] % (self.world_ip, self.api_token, self.api_starttime)
 
-        return self.api_token, self.api_starttime, self.flash
+        return self.api_token, self.api_starttime, self.entry
 
     @asyncio.coroutine
     def get_osapi(self):
@@ -267,7 +267,7 @@ class KancolleAuth:
         return self.osapi_url
 
     @asyncio.coroutine
-    def get_flash(self):
+    def get_entry(self):
         """登录游戏，获取游戏FLASH地址并返回
 
         :return: str
@@ -275,4 +275,4 @@ class KancolleAuth:
         yield from self.get_osapi()
         yield from self._get_world()
         yield from self._get_api_token()
-        return self.flash
+        return self.entry
