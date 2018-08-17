@@ -2,7 +2,7 @@
 
 {% block content -%}
     <div id="ooi-game" class="uk-width-1-1 uk-text-center">
-      <embed id="externalswf" width="1280" height="720" wmode="opaque" quality="high" bgcolor="#000000" allowscriptaccess="always" base="{{ scheme }}://{{ host }}/kcs2/" src="{{ scheme }}://{{ host }}/kcs2/index.php?api_root=/kcsapi&voice_root=/kcs/sound&osapi_root=osapi.dmm.com&version=4.0.0.0&api_token={{ token }}&amp;api_starttime={{ starttime }}" style="display: block !important;"></embed>
+      <embed id="externalswf" width="1280" height="800" wmode="opaque" quality="high" bgcolor="#000000" allowscriptaccess="always" base="{{ scheme }}://{{ host }}/kcs2/" src="{{ scheme }}://{{ host }}/kcs2/index.php?api_root=/kcsapi&voice_root=/kcs/sound&osapi_root=osapi.dmm.com&version=4.0.0.0&api_token={{ token }}&amp;api_starttime={{ starttime }}" style="display: block !important;"></embed>
       <a href="/logout" class="uk-button uk-button-primary">重新登录</a>
     </div>
 {%- endblock %}
