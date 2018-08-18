@@ -79,7 +79,6 @@ class APIHandler:
                     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',
                     'Origin': 'http://' + world_ip + '/',
                     'Referer': referrer,
-                    'X-Requested-With': 'ShockwaveFlash/18.0.0.232'
                 })
                 data = yield from request.post()
                 coro = aiohttp.post(url, data=data, headers=headers, connector=self.connector)
