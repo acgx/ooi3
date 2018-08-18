@@ -64,6 +64,8 @@ def main():
     app.router.add_route('POST', '/service/osapi', service.get_osapi)
     app.router.add_route('POST', '/service/flash', service.get_flash)
     app.router.add_static('/static', config.static_dir)
+    app.router.add_static('/kcs2', config.kcs2_dir)
+    app.router.add_static('/_kcs2', config.kcs2_dir)
     app.router.add_static('/kcs', config.kcs_dir)
     app.router.add_static('/_kcs', config.kcs_dir)
     app_handlers = app.make_handler()
