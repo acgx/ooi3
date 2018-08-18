@@ -100,7 +100,7 @@ class FrontEndHandler:
         world_ip = session.get('world_ip', None)
         if token and starttime and world_ip:
             context = {'scheme': request.scheme,
-                       'host': world_ip,
+                       'host': request.host,
                        'token': token,
                        'starttime': starttime}
             return aiohttp_jinja2.render_template('normal.html', request, context)
@@ -140,7 +140,7 @@ class FrontEndHandler:
         world_ip = session.get('world_ip', None)
         if token and starttime and world_ip:
             context = {'scheme': request.scheme,
-                       'host': world_ip,
+                       'host': request.host,
                        'token': token,
                        'starttime': starttime}
             return aiohttp_jinja2.render_template('flash.html', request, context)
@@ -162,7 +162,7 @@ class FrontEndHandler:
         world_ip = session.get('world_ip', None)
         if token and starttime and world_ip:
             context = {'scheme': request.scheme,
-                       'host': world_ip,
+                       'host': request.host,
                        'token': token,
                        'starttime': starttime}
             return aiohttp_jinja2.render_template('poi.html', request, context)

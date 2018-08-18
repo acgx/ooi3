@@ -54,9 +54,9 @@ class ServiceHandler:
             headers = aiohttp.MultiDict({'Content-Type': 'application/json'})
             kancolle = KancolleAuth(login_id, password)
             try:
-                flash_url = yield from kancolle.get_flash()
+                entry_url = yield from kancolle.get_entry()
                 result = {'status': 1,
-                          'flash_url': flash_url}
+                          'flash_url': entry_url}
             except OOIAuthException as e:
                 result = {'status': 0,
                           'message': e.message}
